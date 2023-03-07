@@ -48,3 +48,5 @@ export class Employee {
 }
 
 export const employeeSchema = SchemaFactory.createForClass(Employee);
+
+employeeSchema.index({ '$**': 'text' });

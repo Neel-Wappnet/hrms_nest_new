@@ -9,6 +9,8 @@ import {
   UploadedFiles,
   UseInterceptors,
   UseGuards,
+  Req,
+  Query,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
@@ -17,6 +19,7 @@ import { Helper } from 'src/common/helper';
 import { CreateEmployeeDto, UpdateEmployeeDto } from './dto';
 import { AtGuard } from 'src/common/guard';
 import { Employee } from './schema/employee.schema';
+import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @UseGuards(AtGuard)
 @Controller('employee')
@@ -54,8 +57,8 @@ export class EmployeeController {
   }
 
   @Get()
-  async findAll(): Promise<Employee[]> {
-    return this.employeeService.findAll();
+  async findAll(@Query() query: ExpressQuery): Promise<Employee[]> {
+    return await this.employeeService.findAll(query);
   }
 
   @Get(':id')

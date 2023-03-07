@@ -3,6 +3,7 @@ import { CreateEmployeeDto, UpdateEmployeeDto } from './dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Employee, employeeDocument } from './schema/employee.schema';
 import { Model } from 'mongoose';
+import { Query as ExpressQuery } from 'express-serve-static-core';
 
 @Injectable()
 export class EmployeeService {
@@ -11,8 +12,17 @@ export class EmployeeService {
     private readonly employeeModel: Model<employeeDocument>,
   ) {}
 
-  async findAll(): Promise<Employee[]> {
-    return this.employeeModel.find().exec();
+  async findAll(query: ExpressQuery): Promise<Employee[]> {
+    const empPerPage = 2;
+    const currentPage = parseInt(query.page as string) || 1;
+    const skip = empPerPage * (currentPage - 1);
+    const sortElement = query.sort as string;
+
+    return await this.employeeModel
+      .find({ $text: { $search: query.search as string } })
+      .limit(empPerPage)
+      .skip(skip)
+      .sort({ [sortElement]: 'asc' });
   }
 
   async findOne(id: string): Promise<Employee> {
